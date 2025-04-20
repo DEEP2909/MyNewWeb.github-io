@@ -5,6 +5,34 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Media Gallery</title>
     <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <header>
+        <h1>My Media Gallery</h1>
+        <nav>
+            <button id="uploadBtn">Upload Media</button>
+            <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="photos">Photos</button>
+                <button class="filter-btn" data-filter="videos">Videos</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <div class="upload-section" id="uploadSection" style="display: none;">
+            <h2>Upload New Media</h2>
+            <form id="uploadForm">
+                <input type="file" id="mediaInput" accept="image/*,video/*" multiple>
+                <button type="submit">Upload</button>
+            </form>
+        </div>
+
+        <div class="gallery" id="gallery">
+            <!-- Media items will be dynamically added here -->
+        </div>
+    </main>
+
     <script type="module">
         // Import the functions you need from the SDKs you need
         import { initializeApp } from "firebase/app";
@@ -37,34 +65,6 @@
             document.getElementById("output").innerHTML = `<a href="${url}" target="_blank">${file.name}</a>`;
           }
     </script>
-</head>
-<body>
-    <header>
-        <h1>My Media Gallery</h1>
-        <nav>
-            <button id="uploadBtn">Upload Media</button>
-            <div class="filter-buttons">
-                <button class="filter-btn active" data-filter="all">All</button>
-                <button class="filter-btn" data-filter="photos">Photos</button>
-                <button class="filter-btn" data-filter="videos">Videos</button>
-            </div>
-        </nav>
-    </header>
-
-    <main>
-        <div class="upload-section" id="uploadSection" style="display: none;">
-            <h2>Upload New Media</h2>
-            <form id="uploadForm">
-                <input type="file" id="mediaInput" accept="image/*,video/*" multiple>
-                <button type="submit">Upload</button>
-            </form>
-        </div>
-
-        <div class="gallery" id="gallery">
-            <!-- Media items will be dynamically added here -->
-        </div>
-    </main>
-
     <input type="file" onchange="uploadFile(this.files[0])" />
     <div id="output"></div>
 
