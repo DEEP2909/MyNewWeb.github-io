@@ -23,8 +23,10 @@
         <div class="upload-section" id="uploadSection" style="display: none;">
             <h2>Upload New Media</h2>
             <form id="uploadForm">
-                <input type="file" id="mediaInput" accept="image/*,video/*" multiple>
-                <button type="submit">Upload</button>
+                <input type="file" id="fileInput" />
+                <button onclick="uploadFromInput()">Upload</button>
+                <div id="output">
+                </div>
             </form>
         </div>
 
@@ -34,37 +36,62 @@
     </main>
 
     <script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-  import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
-  import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-analytics.js";
+import { getStorage, ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-storage.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyB3iw-TiC5s0h-P7TdD5EXPpnMtgR-L4Ro",
-    authDomain: "fileuploader-6d7d7.firebaseapp.com",
-    projectId: "fileuploader-6d7d7",
-    storageBucket: "fileuploader-6d7d7.appspot.com",  // ✅ fixed
-    messagingSenderId: "624092659416",
-    appId: "1:624092659416:web:7d07e4e2047052d6eee1ad",
-    measurementId: "G-0CH09195TJ"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyB3iw-TiC5s0h-P7TdD5EXPpnMtgR-L4Ro",
+  authDomain: "fileuploader-6d7d7.firebaseapp.com",
+  projectId: "fileuploader-6d7d7",
+  storageBucket: "fileuploader-6d7d7.appspot.com",
+  messagingSenderId: "624092659416",
+  appId: "1:624092659416:web:7d07e4e2047052d6eee1ad",
+  measurementId: "G-0CH09195TJ"
+};
 
-  const app = initializeApp(firebaseConfig);
-  const analytics = getAnalytics(app);
-  const storage = getStorage(app); // ✅ initialize storage
+const app = initializeApp(firebaseConfig);
+const analytics = getAnalytics(app);
+const storage = getStorage(app);
 
-  // Upload function
-  window.uploadFile = async function(file) {
-    const storageRef = ref(storage, 'uploads/' + file.name);
-    await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(storageRef);
-    console.log("Uploaded! File available at:", url);
-    document.getElementById("output").innerHTML = `<a href="${url}" target="_blank">${file.name}</a>`;
-  }
+function renderMediaGallery() {
+  const gallery = document.getElementById("gallery");
+  gallery.innerHTML = "";
+  const storedMedia = JSON.parse(localStorage.getItem("mediaFiles") || "[]");
+  storedMedia.forEach(url => {
+    const mediaElem = document.createElement("div");
+    if (url.match(/\.(jpg|jpeg|png|gif)$/i)) {
+      mediaElem.innerHTML = `<img src="${url}" style="max-width: 200px;" />`;
+    } else if (url.match(/\.(mp4|webm|ogg)$/i)) {
+      mediaElem.innerHTML = `<video controls style="max-width: 200px;"><source src="${url}" /></video>`;
+    } else {
+      mediaElem.innerHTML = `<a href="${url}" target="_blank">${url}</a>`;
+    }
+    gallery.appendChild(mediaElem);
+  });
+}
+
+// upload function
+window.uploadFromInput = async function () {
+  const file = document.getElementById("fileInput").files[0];
+  if (!file) return;
+
+  const storageRef = ref(storage, 'uploads/' + file.name);
+  await uploadBytes(storageRef, file);
+  const url = await getDownloadURL(storageRef);
+  console.log("Uploaded:", url);
+
+  let mediaFiles = JSON.parse(localStorage.getItem("mediaFiles") || "[]");
+  mediaFiles.push(url);
+  localStorage.setItem("mediaFiles", JSON.stringify(mediaFiles));
+
+  renderMediaGallery();
+};
+
+// Render previously stored media on page load
+renderMediaGallery();
+
 </script>
-
-    <input type="file" onchange="uploadFile(this.files[0])" />
-    <div id="output"></div>
-
 
     <div class="modal" id="mediaModal">
         <span class="close">&times;</span>
