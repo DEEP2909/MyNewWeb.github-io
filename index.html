@@ -86,6 +86,7 @@ window.uploadFromInput = async function () {
   localStorage.setItem("mediaFiles", JSON.stringify(mediaFiles));
 
   renderMediaGallery();
+    document.getElementById("uploadTrigger").addEventListener("click", uploadFromInput);
 };
 
 // Render previously stored media on page load
